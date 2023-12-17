@@ -1,5 +1,5 @@
-import "./App.css";
-import CameraContainer from "./components/CameraContainer";
+import "../src/App.css";
+import CameraContainer from "../src/components/CameraContainer";
 
 function App() {
   return (
