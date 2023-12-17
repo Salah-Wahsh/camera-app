@@ -11,22 +11,18 @@ const CameraContainer: React.FC = () => {
   });
 
   useEffect(() => {
-    // Update dimensions when the window is resized
     const handleResize = () => {
       setDimensions({
         width: window.innerWidth,
         height: window.innerHeight,
       });
     };
-
-    // Attach the event listener
     window.addEventListener("resize", handleResize);
 
-    // Cleanup the event listener on component unmount
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-  }, []); // Empty dependency array means this effect runs once on mount
+  }, []);
 
   return (
     <div className="h-screen w-screen ">

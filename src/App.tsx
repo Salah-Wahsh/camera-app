@@ -1,5 +1,5 @@
-import "../src/App.css";
-import CameraContainer from "../src/components/CameraContainer";
+import "./App.css"; // Updated path
+import CameraContainer from "./components/CameraContainer";
 
 function App() {
   return (
