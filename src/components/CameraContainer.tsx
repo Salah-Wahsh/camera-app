@@ -3,22 +3,17 @@ import Webcam from "react-webcam";
 import CaptureButton from "./CaptureButton";
 import SelectCam from "./SelectCam";
 import dataURLtoBlob from "../utils/dataURLtoBlob";
+import Countdown from "./Countdown";
 
-const CameraContainer: React.FC = () => {
+interface CameraContainerProps {
+  onCapture: (imageData: any) => void;
+}
+
+const CameraContainer = ({ onCapture }: CameraContainerProps) => {
   const webcamRef = useRef<any>(null);
   const [selectedCamera, setSelectedCamera] = useState<string | undefined>();
-  const capture = React.useCallback(() => {
-    const imageSrc = webcamRef.current!.getScreenshot();
-    if (imageSrc) {
-      const blobImage = dataURLtoBlob(imageSrc);
-      const blobUrl = URL.createObjectURL(blobImage);
-      const anchor = document.createElement("a");
-      anchor.href = blobUrl;
-      anchor.download = "captured_photo.jpg";
-      anchor.click();
-      URL.revokeObjectURL(blobUrl);
-    }
-  }, [webcamRef]);
+  const [countdownActive, setCountdownActive] = useState(false);
+
   const [dimensions, setDimensions] = useState<{
     width: number;
     height: number;
@@ -26,6 +21,25 @@ const CameraContainer: React.FC = () => {
     width: window.innerWidth,
     height: window.innerHeight,
   });
+
+  const capture = React.useCallback(() => {
+    const imageSrc = webcamRef.current!.getScreenshot();
+    if (imageSrc) {
+      const blobImage = dataURLtoBlob(imageSrc);
+      const blobUrl = URL.createObjectURL(blobImage);
+      onCapture(blobUrl); // Pass the captured image data to the parent component
+    }
+  }, [webcamRef, onCapture]);
+
+  const handleCountdownEnd = () => {
+    setCountdownActive(false);
+    // setShowPreview(true);
+    capture();
+  };
+
+  const startCountdown = () => {
+    setCountdownActive(true);
+  };
 
   useEffect(() => {
     const handleResize = () => {
@@ -53,6 +67,7 @@ const CameraContainer: React.FC = () => {
         ref={webcamRef}
         screenshotFormat="image/jpeg"
         mirrored={true}
+        screenshotQuality={1}
         width={dimensions.width}
         height={dimensions.height}
         videoConstraints={{
@@ -60,7 +75,12 @@ const CameraContainer: React.FC = () => {
         }}
         style={{ objectFit: "cover", width: "100%", height: "100%" }}
       />
-      <CaptureButton onClick={capture} />
+
+      {countdownActive && (
+        <Countdown initialCount={1} onCountdownEnd={handleCountdownEnd} />
+      )}
+
+      <CaptureButton onClick={startCountdown} />
     </div>
   );
 };

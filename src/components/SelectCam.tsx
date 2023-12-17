@@ -32,12 +32,6 @@ const SelectCam = ({ selectedCamera, setSelectedCamera }: SelectCamProps) => {
         className="p-4"
         style={{ position: "absolute", top: 0, left: 0, zIndex: 1 }}
       >
-        <label
-          htmlFor="cameraDropdown"
-          className="block text-sm font-medium text-white"
-        >
-          Choose a Camera:
-        </label>
         <select
           id="cameraDropdown"
           value={selectedCamera || ""}
