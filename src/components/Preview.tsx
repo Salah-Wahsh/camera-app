@@ -1,19 +1,19 @@
 import { useEffect, useState } from "react";
 import "../App.css";
 import Button from "./Partials/Button";
+import Record from "./Record";
 
 interface PreviewProps {
   capturedImage: object | any;
   setShowPreview: (open: boolean) => void;
 }
 
-// ... (imports and other code)
-
 const Preview = ({ capturedImage, setShowPreview }: PreviewProps) => {
   const [loading, setLoading] = useState(true);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [showWriteModal, setShowWriteModal] = useState(false);
   const [userText, setUserText] = useState("");
+  const [recording, setRecording] = useState(false);
 
   useEffect(() => {
     const img = new Image();
@@ -90,7 +90,9 @@ const Preview = ({ capturedImage, setShowPreview }: PreviewProps) => {
   };
 
   const handleWriteClick = () => {
-    setShowWriteModal(true);
+    // setShowWriteModal(true);
+    setShowWriteModal(!showWriteModal);
+    setUserText("");
   };
 
   const handleInsertText = () => {
@@ -106,15 +108,29 @@ const Preview = ({ capturedImage, setShowPreview }: PreviewProps) => {
         >
           Retake
         </button>
+
         <div className="flex space-x-8 mb-3">
-          <Button onClick={handleWriteClick}>Write</Button>
-          <Button
-            onClick={() => {
-              console.log("record");
-            }}
-          >
-            Record
-          </Button>
+          {/* {!recording && <Button onClick={handleWriteClick}>Write</Button>} */}
+          {!recording && (
+            <Button
+              onClick={handleWriteClick}
+              backgroundColor={showWriteModal ? "red" : "blue"}
+            >
+              {showWriteModal ? "Cancel Write" : " Write"}
+            </Button>
+          )}
+
+          {!showWriteModal && (
+            <Button
+              onClick={() => {
+                setRecording(!recording);
+              }}
+              backgroundColor={recording ? "red" : "blue"}
+            >
+              {recording ? "Cancel Record" : " Record"}
+            </Button>
+          )}
+
           <Button onClick={handlePrintClick}>Print</Button>
         </div>
       </div>
@@ -129,34 +145,44 @@ const Preview = ({ capturedImage, setShowPreview }: PreviewProps) => {
               className="preview-image"
             />
             {showWriteModal && (
-              <div className="modal">
+              <div className="modal ">
                 <textarea
                   className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   value={userText}
                   onChange={(e) => setUserText(e.target.value)}
                 />
                 <button
-                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
+                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full mt-4 mr-4"
                   onClick={handleInsertText}
                 >
                   Insert
                 </button>
                 <button
+                  className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full "
+                  onClick={() => {
+                    setUserText("");
+                  }}
+                >
+                  Clear
+                </button>
+              </div>
+            )}
+            {/* <button
                   className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
                   onClick={() => {
                     setShowWriteModal(false);
                   }}
                 >
                   Cancel
-                </button>
-              </div>
-            )}
+                </button> */}
             {userText && !showWriteModal && (
               <div className="text-preview text-white text-lg ">
                 {/* Style this as needed */}
                 {userText}
               </div>
             )}
+
+            {recording && <Record />}
           </>
         )}
       </div>
