@@ -74,12 +74,19 @@ const Preview = ({ capturedImage, setShowPreview }: PreviewProps) => {
       // Wait for the image to load before printing
       printImage.onload = () => {
         printWindow.print();
-        printWindow.onafterprint = () => {
-          // Close the new window or iframe after a short delay
-          window.setTimeout(() => {
-            printWindow.close();
-          }, 100);
-        };
+      };
+
+      // Close the new window or iframe after a short delay
+      window.setTimeout(() => {
+        printWindow.close();
+      }, 100);
+
+      // Handle closing the window after printing
+      window.onafterprint = () => {
+        // Close the new window or iframe after a short delay
+        window.setTimeout(() => {
+          printWindow.close();
+        }, 100);
       };
     }
   };

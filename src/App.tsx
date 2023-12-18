@@ -43,7 +43,7 @@ function App() {
             />
           </div>
         ))}
-      {showGallery && <Gallery images={capturedImages} />}
+      {/* {showGallery && <Gallery images={capturedImages} />} */}
     </>
   );
 }
