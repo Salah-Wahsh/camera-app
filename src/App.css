@@ -23,3 +23,20 @@
 .button-container {
   margin-top: 20px;
 }
+
+
+.gallery-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: left;
+  align-items: end;
+}
+
+.gallery-overlay img {
+  width: 100px; /* Set the width of the gallery icon */
+  height: 100px; /* Set the height of the gallery icon */
+}
