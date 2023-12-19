@@ -71,12 +71,18 @@ const Preview = ({ capturedImage, setShowPreview }: PreviewProps) => {
         </html>
       `);
 
-      printWindow.print();
+      printWindow.document.close();
 
-      // Close the new window or iframe after a short delay
-      window.setTimeout(() => {
-        printWindow.close();
-      }, 1);
+      // Listen for the afterprint event
+      printWindow.addEventListener("afterprint", () => {
+        // Close the new window or iframe after the print dialog is closed
+        window.setTimeout(() => {
+          printWindow.close();
+        }, 1);
+      });
+
+      // Trigger the print
+      printWindow.print();
     }
   };
 

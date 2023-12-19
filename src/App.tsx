@@ -34,14 +34,15 @@ function App() {
             <button onClick={() => setShowGallery(false)}>Back</button>
           </div>
         ) : (
-          <div className="gallery-overlay">
-            <img
-              src={galleryIcon}
-              alt="Gallery"
-              className="mb-12 ml-8"
-              onClick={() => setShowGallery(true)}
-            />
-          </div>
+          <></>
+          // <div className="gallery-overlay">
+          //   <img
+          //     src={galleryIcon}
+          //     alt="Gallery"
+          //     className="mb-12 ml-8"
+          //     onClick={() => setShowGallery(true)}
+          //   />
+          // </div>
         ))}
       {/* {showGallery && <Gallery images={capturedImages} />} */}
     </>
