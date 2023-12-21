@@ -30,6 +30,7 @@ const Preview = ({
   const [showWriteModal, setShowWriteModal] = useState(false);
   const [userText, setUserText] = useState("");
   const [recording, setRecording] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
 
   useEffect(() => {
     const img = new Image();
@@ -74,12 +75,13 @@ const Preview = ({
       printContent.appendChild(textElement);
     }
     
-    // Convert the QRCodeSVG component to HTML string
-    const qrCodeHTML = componentToHtmlString(
-      <div style={{ position: "absolute", top: "0", right: "0", padding: "0" }}>
-        <QRCodeSVG value="https://reactjs.org/" size={64}/>
-      </div>
-    );
+    const qrCodeHTML = isSaved
+    ? componentToHtmlString(
+        <div style={{ position: "absolute", top: "0", right: "0", padding: "0" }}>
+          <QRCodeSVG value="https://reactjs.org/" size={64} />
+        </div>
+      )
+    : '';
     
     printContent.innerHTML += qrCodeHTML;
     
@@ -141,7 +143,7 @@ const Preview = ({
             </Button>
           )}
 
-          {!showWriteModal && (
+          {!showWriteModal && userText.length==0 && (
             <Button
               onClick={() => {
                 setRecording(!recording);
@@ -160,10 +162,11 @@ const Preview = ({
           <p>Loading...</p>
         ) : (
           <>
-            <QRCodeSVG
+          {isSaved && (  <QRCodeSVG
               value="https://reactjs.org/"
               className="absolute top-0 right-0 p-4"
-            />
+            />)}
+          
             <img
               src={imageSrc || ""}
               alt="Captured Preview"
@@ -173,7 +176,7 @@ const Preview = ({
             {showWriteModal && (
               <div className="modal ">
                 <textarea
-                  className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  className="block p-2.5 w-full text-2xl text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   value={userText}
                   onChange={(e) => setUserText(e.target.value)}
                 />
@@ -194,12 +197,12 @@ const Preview = ({
               </div>
             )}
             {userText && !showWriteModal && (
-              <div className="text-preview text-white text-lg ">
+              <div className="text-preview text-white text-2xl ">
                 {userText}
               </div>
             )}
 
-            {recording && <Record />}
+            {recording && <Record setIsSaved={setIsSaved}/>}
           </>
         )}
       </div>

@@ -1,14 +1,16 @@
 import { useState, useRef } from "react";
 import recordEffect from "../assets/recordEffect.gif";
-
-const Record = () => {
+interface RecordProps {
+  setIsSaved: (isSaved: boolean) => void;
+}
+const Record = ({setIsSaved}: RecordProps) => {
   const [recording, setRecording] = useState(false);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const [showDownload, setshowDownload] = useState(false);
+  const [showDownload, setShowDownload] = useState(false);
 
   const startRecording = () => {
-    setshowDownload(false);
+    setShowDownload(false);
     navigator.mediaDevices
       .getUserMedia({ audio: true })
       .then((stream) => {
@@ -39,17 +41,18 @@ const Record = () => {
     ) {
       mediaRecorderRef.current.stop();
       setRecording(false);
-      setshowDownload(true);
+      setShowDownload(true);
     }
   };
 
   const handleSave = () => {
+    setIsSaved(true);
     if (audioBlob) {
       const downloadLink = document.createElement("a");
       downloadLink.href = URL.createObjectURL(audioBlob);
       downloadLink.download = "recorded_audio.wav";
       downloadLink.click();
-      setshowDownload(false);
+      setShowDownload(false);
     }
   };
 
