@@ -2,13 +2,28 @@ import { useEffect, useState } from "react";
 import "../App.css";
 import Button from "./Partials/Button";
 import Record from "./Record";
+import { QRCodeSVG } from "qrcode.react";
+import ReactDOM from 'react-dom';
+
+
+const componentToHtmlString = (component) => {
+  const wrapper = document.createElement("div");
+  ReactDOM.render(component, wrapper);
+  return wrapper.innerHTML;
+};
+
 
 interface PreviewProps {
   capturedImage: object | any;
   setShowPreview: (open: boolean) => void;
+  setShowCameraContainer: (open: boolean) => void;
 }
 
-const Preview = ({ capturedImage, setShowPreview }: PreviewProps) => {
+const Preview = ({
+  capturedImage,
+  setShowPreview,
+  setShowCameraContainer,
+}: PreviewProps) => {
   const [loading, setLoading] = useState(true);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [showWriteModal, setShowWriteModal] = useState(false);
@@ -44,20 +59,30 @@ const Preview = ({ capturedImage, setShowPreview }: PreviewProps) => {
   const printImage = (capturedImage: string): void => {
     const printContent = document.createElement("div");
     printContent.style.textAlign = "center";
-
+    
     const printImage = new Image();
     printImage.src = capturedImage;
     printImage.style.maxWidth = "100%";
     printImage.style.maxHeight = "100vh";
     printContent.appendChild(printImage);
-
+    
     if (userText) {
       const textElement = document.createElement("div");
       textElement.innerText = userText;
       textElement.style.marginTop = "10px";
       printContent.appendChild(textElement);
     }
-
+    
+    // Convert the QRCodeSVG component to HTML string
+    const qrCodeHTML = componentToHtmlString(
+      <div style={{ position: "absolute", top: "0", right: "0", padding: "0" }}>
+        <QRCodeSVG value="https://reactjs.org/" size={64}/>
+      </div>
+    );
+    
+    // Append the QR code HTML string to the printContent
+    printContent.innerHTML += qrCodeHTML;
+    
     const printWindow = window.open("", "_blank");
     if (printWindow) {
       printWindow.document.write(`
@@ -70,19 +95,23 @@ const Preview = ({ capturedImage, setShowPreview }: PreviewProps) => {
           </body>
         </html>
       `);
-
+    
       printWindow.print();
-
+    
       // Close the new window or iframe after a short delay
       window.setTimeout(() => {
         printWindow.close();
       }, 1);
     }
   };
+  
+  
+  
 
   const handleRetakeClick = () => {
     setImageSrc(null);
     setShowPreview(false);
+    setShowCameraContainer(true);
   };
 
   const handleWriteClick = () => {
@@ -130,16 +159,21 @@ const Preview = ({ capturedImage, setShowPreview }: PreviewProps) => {
           <Button onClick={handlePrintClick}>Print</Button>
         </div>
       </div>
-      <div className="preview-frame mt-20">
+      <div className="preview-frame mt-20 relative">
         {loading ? (
           <p>Loading...</p>
         ) : (
           <>
+            <QRCodeSVG
+              value="https://reactjs.org/"
+              className="absolute top-0 right-0 p-4"
+            />
             <img
               src={imageSrc || ""}
               alt="Captured Preview"
               className="preview-image"
             />
+
             {showWriteModal && (
               <div className="modal ">
                 <textarea

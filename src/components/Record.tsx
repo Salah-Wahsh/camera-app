@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import recordEffect from "../assets/recordEffect.gif";
+
 const Record = () => {
   const [recording, setRecording] = useState(false);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);

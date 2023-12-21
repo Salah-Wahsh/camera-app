@@ -4,12 +4,22 @@ import CaptureButton from "./CaptureButton";
 import SelectCam from "./SelectCam";
 import dataURLtoBlob from "../utils/dataURLtoBlob";
 import Countdown from "./Countdown";
-
+import "../App.css";
+import galleryIcon from "../assets/gallery.png";
+import ImageType from "../utils/generalTypes";
 interface CameraContainerProps {
   onCapture: (imageData: any) => void;
+  setShowGallery: (open: boolean) => void;
+  setShowCameraContainer: (open: boolean) => void;
+  capturedImages: ImageType[];
 }
 
-const CameraContainer = ({ onCapture }: CameraContainerProps) => {
+const CameraContainer = ({
+  onCapture,
+  setShowGallery,
+  setShowCameraContainer,
+  capturedImages,
+}: CameraContainerProps) => {
   const webcamRef = useRef<any>(null);
   const [selectedCamera, setSelectedCamera] = useState<string | undefined>();
   const [countdownActive, setCountdownActive] = useState(false);
@@ -35,6 +45,10 @@ const CameraContainer = ({ onCapture }: CameraContainerProps) => {
     setCountdownActive(false);
     // setShowPreview(true);
     capture();
+  };
+  const handleShowGallery = () => {
+    setShowCameraContainer(false);
+    setShowGallery(true);
   };
 
   const startCountdown = () => {
@@ -73,7 +87,7 @@ const CameraContainer = ({ onCapture }: CameraContainerProps) => {
         videoConstraints={{
           deviceId: selectedCamera,
         }}
-        style={{ objectFit: "cover", width: "100%", height: "100%" }}
+        style={{ width: "100%", height: "100%" }}
       />
 
       {countdownActive && (
@@ -81,6 +95,11 @@ const CameraContainer = ({ onCapture }: CameraContainerProps) => {
       )}
 
       <CaptureButton onClick={startCountdown} />
+      {capturedImages.length > 0 && (<img
+        className="absolute bottom-10 left-10 transform -translate-x-1 w-28 h-28  transition "
+        src={galleryIcon}
+        onClick={handleShowGallery}
+      />)} 
     </div>
   );
 };

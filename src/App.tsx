@@ -1,50 +1,60 @@
 import "./App.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CameraContainer from "./components/CameraContainer";
 import Preview from "./components/Preview";
 import Gallery from "./components/Gallery";
-import galleryIcon from "./assets/gallery.png";
+import ImageType  from "./utils/generalTypes";
 
 function App() {
   const [showPreview, setShowPreview] = useState(false);
-  const [capturedImage, setCapturedImage] = useState(null);
-  const [capturedImages, setCapturedImages] = useState<any>([]); // State to store captured images
   const [showGallery, setShowGallery] = useState(false);
+  const [showCameraContainer, setShowCameraContainer] = useState(true);
+  const [capturedImage, setCapturedImage] =useState<ImageType | null>(null);
+  const [capturedImages, setCapturedImages] = useState<ImageType[]>([]);
 
-  const handleCapture = (imageData: any) => {
+
+  const handleCapture = (imageData: ImageType) => {
     setCapturedImage(imageData);
-    setCapturedImages((prevImages: any) => [imageData, ...prevImages]); // Store the captured image
+    setCapturedImages((prevImages: ImageType[]) => [imageData, ...prevImages]);
     setShowPreview(true);
+    setShowCameraContainer(false);
   };
+
+  const handleShowGallery = () => {
+    setShowGallery(true);
+    setShowCameraContainer(false);
+  };
+
+  const handleBackButton = () => {
+    setShowCameraContainer(true);
+    setShowGallery(false);
+  };
+  //to set the camera view by default
+  useEffect(() => {
+    !showGallery && !showPreview && setShowCameraContainer(true);
+  }, []);
 
   return (
     <>
-      {showPreview ? (
+      {showPreview && (
         <Preview
           capturedImage={capturedImage}
           setShowPreview={setShowPreview}
+          setShowCameraContainer={setShowCameraContainer}
         />
-      ) : (
-        !showGallery && <CameraContainer onCapture={handleCapture} />
       )}
-      {capturedImages.length > 0 &&
-        !showPreview &&
-        (showGallery ? (
-          <div className="gallery-overlay">
-            <button onClick={() => setShowGallery(false)}>Back</button>
-          </div>
-        ) : (
-          <></>
-          // <div className="gallery-overlay">
-          //   <img
-          //     src={galleryIcon}
-          //     alt="Gallery"
-          //     className="mb-12 ml-8"
-          //     onClick={() => setShowGallery(true)}
-          //   />
-          // </div>
-        ))}
-      {/* {showGallery && <Gallery images={capturedImages} />} */}
+      {showCameraContainer && !showPreview && (
+        <CameraContainer
+          onCapture={handleCapture}
+          setShowGallery={handleShowGallery}
+          setShowCameraContainer={setShowCameraContainer}
+          capturedImages={capturedImages}
+        />
+      )}
+    {showGallery && !showPreview && (
+      <Gallery images={capturedImages} handleBackButton={handleBackButton} />
+    )}
+
     </>
   );
 }
