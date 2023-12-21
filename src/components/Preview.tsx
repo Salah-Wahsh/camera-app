@@ -4,9 +4,10 @@ import Button from "./Partials/Button";
 import Record from "./Record";
 import { QRCodeSVG } from "qrcode.react";
 import ReactDOM from 'react-dom';
+import { JSX } from "react/jsx-runtime";
 
 
-const componentToHtmlString = (component) => {
+const componentToHtmlString = (component: JSX.Element) => {
   const wrapper = document.createElement("div");
   ReactDOM.render(component, wrapper);
   return wrapper.innerHTML;
@@ -14,7 +15,7 @@ const componentToHtmlString = (component) => {
 
 
 interface PreviewProps {
-  capturedImage: object | any;
+  capturedImage: string;
   setShowPreview: (open: boolean) => void;
   setShowCameraContainer: (open: boolean) => void;
 }
@@ -80,7 +81,6 @@ const Preview = ({
       </div>
     );
     
-    // Append the QR code HTML string to the printContent
     printContent.innerHTML += qrCodeHTML;
     
     const printWindow = window.open("", "_blank");
@@ -98,15 +98,12 @@ const Preview = ({
     
       printWindow.print();
     
-      // Close the new window or iframe after a short delay
       window.setTimeout(() => {
         printWindow.close();
       }, 1);
     }
   };
-  
-  
-  
+
 
   const handleRetakeClick = () => {
     setImageSrc(null);
@@ -135,7 +132,6 @@ const Preview = ({
         </button>
 
         <div className="flex space-x-8 mb-3">
-          {/* {!recording && <Button onClick={handleWriteClick}>Write</Button>} */}
           {!recording && (
             <Button
               onClick={handleWriteClick}
@@ -197,17 +193,8 @@ const Preview = ({
                 </button>
               </div>
             )}
-            {/* <button
-                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
-                  onClick={() => {
-                    setShowWriteModal(false);
-                  }}
-                >
-                  Cancel
-                </button> */}
             {userText && !showWriteModal && (
               <div className="text-preview text-white text-lg ">
-                {/* Style this as needed */}
                 {userText}
               </div>
             )}

@@ -2,14 +2,14 @@ interface ButtonProps {
   children: string;
   onClick: () => void;
   disabled?: boolean;
-  backgroundColor?: string; // Add backgroundColor prop
+  backgroundColor?: string; 
 }
 
 const Button = ({
   children,
   onClick,
   disabled,
-  backgroundColor = "blue", // Set default value to "blue"
+  backgroundColor = "blue",
 }: ButtonProps) => {
   return (
     <button

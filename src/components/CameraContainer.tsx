@@ -6,12 +6,11 @@ import dataURLtoBlob from "../utils/dataURLtoBlob";
 import Countdown from "./Countdown";
 import "../App.css";
 import galleryIcon from "../assets/gallery.png";
-import ImageType from "../utils/generalTypes";
 interface CameraContainerProps {
-  onCapture: (imageData: any) => void;
+  onCapture: (imageData: string) => void;
   setShowGallery: (open: boolean) => void;
   setShowCameraContainer: (open: boolean) => void;
-  capturedImages: ImageType[];
+  capturedImages: string[];
 }
 
 const CameraContainer = ({
@@ -20,7 +19,7 @@ const CameraContainer = ({
   setShowCameraContainer,
   capturedImages,
 }: CameraContainerProps) => {
-  const webcamRef = useRef<any>(null);
+  const webcamRef = useRef<Webcam>(null);
   const [selectedCamera, setSelectedCamera] = useState<string | undefined>();
   const [countdownActive, setCountdownActive] = useState(false);
 

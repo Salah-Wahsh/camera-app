@@ -3,19 +3,18 @@ import { useEffect, useState } from "react";
 import CameraContainer from "./components/CameraContainer";
 import Preview from "./components/Preview";
 import Gallery from "./components/Gallery";
-import ImageType  from "./utils/generalTypes";
 
 function App() {
   const [showPreview, setShowPreview] = useState(false);
   const [showGallery, setShowGallery] = useState(false);
   const [showCameraContainer, setShowCameraContainer] = useState(true);
-  const [capturedImage, setCapturedImage] =useState<ImageType | null>(null);
-  const [capturedImages, setCapturedImages] = useState<ImageType[]>([]);
+  const [capturedImage, setCapturedImage] =useState< string | null>(null);
+  const [capturedImages, setCapturedImages] = useState<string[]>([]);
 
 
-  const handleCapture = (imageData: ImageType) => {
-    setCapturedImage(imageData);
-    setCapturedImages((prevImages: ImageType[]) => [imageData, ...prevImages]);
+  const handleCapture = (image: string) => {
+    setCapturedImage(image);
+    setCapturedImages((prevImages) => [image, ...prevImages]);
     setShowPreview(true);
     setShowCameraContainer(false);
   };
@@ -29,16 +28,15 @@ function App() {
     setShowCameraContainer(true);
     setShowGallery(false);
   };
-  //to set the camera view by default
   useEffect(() => {
     !showGallery && !showPreview && setShowCameraContainer(true);
-  }, []);
+  }, [showGallery, showPreview]);
 
   return (
     <>
       {showPreview && (
         <Preview
-          capturedImage={capturedImage}
+          capturedImage={capturedImage!}
           setShowPreview={setShowPreview}
           setShowCameraContainer={setShowCameraContainer}
         />
