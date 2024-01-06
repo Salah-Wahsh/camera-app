@@ -2,14 +2,16 @@ import { useState, useRef } from "react";
 import recordEffect from "../assets/recordEffect.gif";
 interface RecordProps {
   setIsSaved: (isSaved: boolean) => void;
+  setUserText: (isSaved: string) => void;
 }
-const Record = ({setIsSaved}: RecordProps) => {
+const Record = ({setIsSaved, setUserText}: RecordProps) => {
   const [recording, setRecording] = useState(false);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const [showDownload, setShowDownload] = useState(false);
 
   const startRecording = () => {
+    setUserText("");
     setShowDownload(false);
     navigator.mediaDevices
       .getUserMedia({ audio: true })

@@ -4,14 +4,14 @@ import Button from "./Partials/Button";
 import Record from "./Record";
 import { QRCodeSVG } from "qrcode.react";
 import ReactDOM from 'react-dom';
-import { JSX } from "react/jsx-runtime";
+// import { JSX } from "react/jsx-runtime";
 
 
-const componentToHtmlString = (component: JSX.Element) => {
-  const wrapper = document.createElement("div");
-  ReactDOM.render(component, wrapper);
-  return wrapper.innerHTML;
-};
+// const componentToHtmlString = (component: JSX.Element) => {
+//   const wrapper = document.createElement("div");
+//   ReactDOM.render(component, wrapper);
+//   return wrapper.innerHTML;
+// };
 
 
 interface PreviewProps {
@@ -68,35 +68,41 @@ const Preview = ({
     printImage.style.maxHeight = "100vh";
     printContent.appendChild(printImage);
     
-    if (userText) {
+    if (userText && !recording) {
       const textElement = document.createElement("div");
       textElement.innerText = userText;
       textElement.style.marginTop = "10px";
       printContent.appendChild(textElement);
     }
     
-    const qrCodeHTML = isSaved
-    ? componentToHtmlString(
-        <div style={{ position: "absolute", top: "0", right: "0", padding: "0" }}>
-          <QRCodeSVG value="https://reactjs.org/" size={64} />
-        </div>
-      )
-    : '';
-    
-    printContent.innerHTML += qrCodeHTML;
+    if (isSaved) {
+      const qrCodeWrapper = document.createElement("div");
+      qrCodeWrapper.style.position = "absolute";
+      qrCodeWrapper.style.top = "0";
+      qrCodeWrapper.style.right = "0";
+      qrCodeWrapper.style.padding = "0";
+      ReactDOM.render(<QRCodeSVG value="https://reactjs.org/" size={64} />, qrCodeWrapper);
+      printContent.appendChild(qrCodeWrapper);
+    }
     
     const printWindow = window.open("", "_blank");
     if (printWindow) {
-      printWindow.document.write(`
+      const doc = document.implementation.createHTMLDocument("Print Image");
+      doc.documentElement.innerHTML = `
         <html>
           <head>
             <title>Print Image</title>
           </head>
           <body style="margin: 0;">
-            ${printContent.outerHTML}
+              ${printContent.outerHTML}
           </body>
         </html>
-      `);
+      `;
+    
+      printWindow.document.replaceChild(
+        printWindow.document.importNode(doc.documentElement, true),
+        printWindow.document.documentElement
+      );
     
       printWindow.print();
     
@@ -105,7 +111,6 @@ const Preview = ({
       }, 1);
     }
   };
-
 
   const handleRetakeClick = () => {
     setImageSrc(null);
@@ -162,7 +167,7 @@ const Preview = ({
           <p>Loading...</p>
         ) : (
           <>
-          {isSaved && (  <QRCodeSVG
+          {isSaved && userText.length==0&&(  <QRCodeSVG
               value="https://reactjs.org/"
               className="absolute top-0 right-0 p-4"
             />)}
@@ -202,7 +207,7 @@ const Preview = ({
               </div>
             )}
 
-            {recording && <Record setIsSaved={setIsSaved}/>}
+            {recording && <Record setUserText={setUserText} setIsSaved={setIsSaved}/>}
           </>
         )}
       </div>
