@@ -29,6 +29,8 @@ const Preview = ({
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [showWriteModal, setShowWriteModal] = useState(false);
   const [userText, setUserText] = useState("");
+  const [husbandName, sethusbandName] = useState("");
+  const [wifeName, setwifeName] = useState("");
   const [recording, setRecording] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
 
@@ -59,58 +61,107 @@ const Preview = ({
   };
 
   const printImage = (capturedImage: string): void => {
+    const container = document.createElement("div");
+    container.style.display = "flex";
     const printContent = document.createElement("div");
     printContent.style.textAlign = "center";
-    
+    container.appendChild(printContent);
+  
+
     const printImage = new Image();
     printImage.src = capturedImage;
-    printImage.style.maxWidth = "100%";
-    printImage.style.maxHeight = "100vh";
+    printImage.style.maxWidth = "85%";
+    printImage.style.position = "relative";
+    printImage.style.zIndex = "-1";
     printContent.appendChild(printImage);
-    
-    if (userText && !recording) {
-      const textElement = document.createElement("div");
-      textElement.innerText = userText;
-      textElement.style.marginTop = "10px";
-      printContent.appendChild(textElement);
-    }
-    
-    if (isSaved) {
+
+  // recording
+    if (isSaved && userText.length === 0) {
       const qrCodeWrapper = document.createElement("div");
-      qrCodeWrapper.style.position = "absolute";
-      qrCodeWrapper.style.top = "0";
-      qrCodeWrapper.style.right = "0";
-      qrCodeWrapper.style.padding = "0";
+      qrCodeWrapper.style.marginTop = "25px";
       ReactDOM.render(<QRCodeSVG value="https://reactjs.org/" size={64} />, qrCodeWrapper);
       printContent.appendChild(qrCodeWrapper);
     }
-    
+  
     const printWindow = window.open("", "_blank");
     if (printWindow) {
       const doc = document.implementation.createHTMLDocument("Print Image");
-      doc.documentElement.innerHTML = `
-        <html>
-          <head>
-            <title>Print Image</title>
-          </head>
-          <body style="margin: 0;">
-              ${printContent.outerHTML}
-          </body>
-        </html>
-      `;
+doc.documentElement.innerHTML = `
+  <html>
+    <head>
+      <title>Print Image</title>
+      <style>
+        body {
+          margin: 0;
+        }
+        .container {
+          position: relative;
+        }
+        .overlay {
+          position: absolute;
+          bottom: -1%;
+          left: 50%;
+          transform: translateX(-50%);
+          text-align: center;
+          background-color: white;
+          padding: 10px 20px;
+          border-radius: 5px;
+        }
+        .center {
+          text-align: center;
+        }
+        .wedDate {
+          position: absolute;
+          right: 8%;
+          font-size: 1.5rem;
+          font-weight: bold;
+        }
+        .overlay p {
+          margin: 0;
+          padding: 0;
+          font-size: 1rem;
+          font-family: 'Noto Sans Arabic', sans-serif;
+          font-weight: 300;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        ${printContent.outerHTML}
+        <div class="overlay">
+          <p>لقطة</p>
+        </div>
+      </div>
+      <div class="wedDate">
+        <p style="font-size:1.2rem">${new Date().toLocaleDateString()}</p>
+      </div>
+      ${husbandName && wifeName ? `<div class="center">
+      <p style="font-size:1.7rem; font-family: 'Montserrat', sans-serif; font-weight:500;">
+      ${husbandName} & ${wifeName}</p>
+    </div>` : ""}
+      
+    ${userText ? `<div class="userText center">
+      <p style="font-size:1.3rem">${userText}</p>
+    </div>` : ""}
+    </body>
+  </html>
+`;
     
+      
+  
       printWindow.document.replaceChild(
         printWindow.document.importNode(doc.documentElement, true),
         printWindow.document.documentElement
       );
-    
+  
       printWindow.print();
-    
+  
       window.setTimeout(() => {
         printWindow.close();
       }, 1);
     }
   };
+  
 
   const handleRetakeClick = () => {
     setImageSrc(null);
@@ -137,6 +188,23 @@ const Preview = ({
         >
           Retake
         </button>
+        <label className="text-white font-medium" htmlFor="husbandName">Husband Name
+        <br/>
+        <input
+        className="mt-2 h-12 rounded-lg text-black"
+        id="husbandName"  
+         value={husbandName}
+          onChange={(e) => sethusbandName(e.target.value)}/></label>
+       
+
+       <label className="text-white font-medium" htmlFor="husbandName">Wife's Name
+        <br/>
+        <input
+        className="mt-2 h-12 rounded-lg text-black"
+        id="wifeName"  
+         value={wifeName}
+          onChange={(e) => setwifeName(e.target.value)}/></label>
+
 
         <div className="flex space-x-8 mb-3">
           {!recording && (
@@ -207,7 +275,7 @@ const Preview = ({
               </div>
             )}
 
-            {recording && <Record setUserText={setUserText} setIsSaved={setIsSaved}/>}
+            {recording && <Record setUserText={setUserText} setIsSaved={setIsSaved} setRecord={setRecording}/>}
           </>
         )}
       </div>

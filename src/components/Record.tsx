@@ -3,8 +3,9 @@ import recordEffect from "../assets/recordEffect.gif";
 interface RecordProps {
   setIsSaved: (isSaved: boolean) => void;
   setUserText: (isSaved: string) => void;
+  setRecord: (Record: boolean) => void; 
 }
-const Record = ({setIsSaved, setUserText}: RecordProps) => {
+const Record = ({setIsSaved, setUserText, setRecord}: RecordProps) => {
   const [recording, setRecording] = useState(false);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -49,6 +50,7 @@ const Record = ({setIsSaved, setUserText}: RecordProps) => {
 
   const handleSave = () => {
     setIsSaved(true);
+    setRecord(false);
     if (audioBlob) {
       const downloadLink = document.createElement("a");
       downloadLink.href = URL.createObjectURL(audioBlob);
