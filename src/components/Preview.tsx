@@ -60,31 +60,34 @@ const Preview = ({
 
   const printImage = (capturedImage: string): void => {
     const printContent = document.createElement("div");
-    printContent.style.textAlign = "center";
-    
+    // printContent.style.textAlign = "center";
+   printContent.style.display = "flex";
+   printContent.style.justifyContent = "space-around";
     const printImage = new Image();
     printImage.src = capturedImage;
-    printImage.style.maxWidth = "100%";
-    printImage.style.maxHeight = "100vh";
+    printImage.style.alignSelf = "left";
+    printImage.style.maxWidth = "70%";
     printContent.appendChild(printImage);
-    
+  
     if (userText && !recording) {
       const textElement = document.createElement("div");
       textElement.innerText = userText;
-      textElement.style.marginTop = "10px";
+      textElement.style.wordWrap = "break-word"; // Allow long words to wrap to new lines
+      textElement.style.maxWidth = "20%"; // Adjust max-width as needed
+      textElement.style.justifyContent = "center";
+      textElement.style.alignSelf = "center";
+      textElement.style.fontSize = "16px";
+      
       printContent.appendChild(textElement);
     }
-    
-    if (isSaved) {
+    if (isSaved && userText.length==0) {
       const qrCodeWrapper = document.createElement("div");
-      qrCodeWrapper.style.position = "absolute";
-      qrCodeWrapper.style.top = "0";
-      qrCodeWrapper.style.right = "0";
-      qrCodeWrapper.style.padding = "0";
-      ReactDOM.render(<QRCodeSVG value="https://reactjs.org/" size={64} />, qrCodeWrapper);
+      ReactDOM.render(<QRCodeSVG value="https://reactjs.org/" size={128} />, qrCodeWrapper);
+      qrCodeWrapper.style.justifySelf = "center";
+      qrCodeWrapper.style.alignSelf = "center";
       printContent.appendChild(qrCodeWrapper);
     }
-    
+  
     const printWindow = window.open("", "_blank");
     if (printWindow) {
       const doc = document.implementation.createHTMLDocument("Print Image");
@@ -98,19 +101,20 @@ const Preview = ({
           </body>
         </html>
       `;
-    
+  
       printWindow.document.replaceChild(
         printWindow.document.importNode(doc.documentElement, true),
         printWindow.document.documentElement
       );
-    
+  
       printWindow.print();
-    
+  
       window.setTimeout(() => {
         printWindow.close();
       }, 1);
     }
   };
+  
 
   const handleRetakeClick = () => {
     setImageSrc(null);
@@ -121,6 +125,7 @@ const Preview = ({
   const handleWriteClick = () => {
     // setShowWriteModal(true);
     setShowWriteModal(!showWriteModal);
+    setIsSaved(false)
     setUserText("");
   };
 
@@ -162,27 +167,29 @@ const Preview = ({
           <Button onClick={handlePrintClick}>Print</Button>
         </div>
       </div>
-      <div className="preview-frame mt-20 relative">
+      <div className="preview-frame mt-20 flex">
         {loading ? (
           <p>Loading...</p>
         ) : (
           <>
-          {isSaved && userText.length==0&&(  <QRCodeSVG
-              value="https://reactjs.org/"
-              className="absolute top-0 right-0 p-4"
-            />)}
+         
           
             <img
               src={imageSrc || ""}
               alt="Captured Preview"
-              className="preview-image"
+              className={`preview-image ${userText? `max-w-[80%]` : `max-w-[100%]`}`}
             />
+             {isSaved && !recording && userText.length==0&&(  <QRCodeSVG
+              value="https://reactjs.org/"
+              // className="absolute top-0 right-0 p-4"
+            />)}
 
             {showWriteModal && (
-              <div className="modal ">
+              <div className="modal ml-5 mt-5">
                 <textarea
                   className="block p-2.5 w-full text-2xl text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   value={userText}
+                  rows={10}
                   onChange={(e) => setUserText(e.target.value)}
                 />
                 <button
@@ -202,12 +209,12 @@ const Preview = ({
               </div>
             )}
             {userText && !showWriteModal && (
-              <div className="text-preview text-white text-2xl ">
-                {userText}
-              </div>
+              <div className="text-white text-2xl w-[20rem] self-center" style={{ wordWrap: 'break-word' }}>
+              {userText}
+            </div>
             )}
 
-            {recording && <Record setUserText={setUserText} setIsSaved={setIsSaved}/>}
+            {recording && <Record setUserText={setUserText} setIsSaved={setIsSaved} setRecord={setRecording}/>}
           </>
         )}
       </div>
