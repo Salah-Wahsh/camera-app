@@ -3,17 +3,7 @@ import "../App.css";
 import Button from "./Partials/Button";
 import Record from "./Record";
 import { QRCodeSVG } from "qrcode.react";
-import ReactDOM from 'react-dom';
-
-// import { JSX } from "react/jsx-runtime";
-
-
-// const componentToHtmlString = (component: JSX.Element) => {
-//   const wrapper = document.createElement("div");
-//   ReactDOM.render(component, wrapper);
-//   return wrapper.innerHTML;
-// };
-
+import ReactDOMServer from "react-dom/server";
 
 interface PreviewProps {
   capturedImage: string;
@@ -53,11 +43,8 @@ const Preview = ({
       img.onerror = null;
     };
   }, [capturedImage]);
+
   const handlePrintClick = () => {
-    const anchor = document.createElement("a");
-    anchor.href = capturedImage;
-    anchor.download = "captured_photo.jpg";
-    anchor.click();
     printImage(capturedImage);
   };
 
@@ -68,7 +55,6 @@ const Preview = ({
     printContent.style.textAlign = "center";
     container.appendChild(printContent);
   
-
     const printImage = new Image();
     printImage.src = capturedImage; 
 
@@ -77,98 +63,104 @@ const Preview = ({
     printImage.style.zIndex = "-1";
     printContent.appendChild(printImage);
 
-  // recording
+    // recording
     if (isSaved && userText.length === 0) {
+      const qrCodeElement = <QRCodeSVG value={audioURL} size={64} />;
+      const qrCodeHTML = ReactDOMServer.renderToString(qrCodeElement);
+    
       const qrCodeWrapper = document.createElement("div");
-      // qrCodeWrapper.style.marginLeft = "200px";
-      qrCodeWrapper.style.position = "absolute";
-      qrCodeWrapper.style.bottom = "-15%";
-      qrCodeWrapper.style.left = "2%";
-      qrCodeWrapper.style.width = "100px";
-      qrCodeWrapper.style.height = "100px";
+      qrCodeWrapper.innerHTML = qrCodeHTML;
       
-      console.log(audioURL, "audioURL");
-      ReactDOM.render(<QRCodeSVG value={audioURL} size={64} />, qrCodeWrapper);
+      // Set styles for qrCodeWrapper
+      qrCodeWrapper.style.position = "absolute";
+      qrCodeWrapper.style.bottom = "-17%";
+      qrCodeWrapper.style.left = "2%";
+      qrCodeWrapper.style.width = "80px";
+      qrCodeWrapper.style.height = "80px";
+      
       printContent.appendChild(qrCodeWrapper);
     }
-  
+    
     const printWindow = window.open("", "_blank");
     if (printWindow) {
       const doc = document.implementation.createHTMLDocument("Print Image");
-doc.documentElement.innerHTML = `
-  <html>
-    <head>
-      <title>Print Image</title>
-      <style>
-        body {
-          margin: 0;
-        }
-        .container {
-          position: relative;
-        }
-        .overlay {
-          position: absolute;
-          bottom: -1%;
-          left: 50%;
-          transform: translateX(-50%);
-          text-align: center;
-          background-color: white;
-          padding: 10px 20px;
-          border-radius: 5px;
-        }
-        .center {
-          text-align: center;
-        }
-        .wedDate {
-          position: absolute;
-          right: 8%;
-          font-size: 1.5rem;
-          font-weight: bold;
-        }
-        .overlay p {
-          margin: 0;
-          padding: 0;
-          font-size: 1rem;
-          font-family: 'Noto Sans Arabic', sans-serif;
-          font-weight: 300;
-        }
-      </style>
-    </head>
-    <body>
-      <div class="container">
-        ${printContent.outerHTML}
-        <div class="overlay">
-          <p>لقطة</p>
-        </div>
-      </div>
-      <div class="wedDate">
-        <p style="font-size:1.2rem">${new Date().toLocaleDateString()}</p>
-      </div>
-      ${husbandName && wifeName ? `<div class="center">
-      <p style="font-size:1.7rem; font-family: 'Montserrat', sans-serif; font-weight:500;">
-      ${husbandName} & ${wifeName}</p>
-    </div>` : ""}
-      
-    ${userText ? `<div class="userText center">
-      <p style="font-size:1.3rem">${userText}</p>
-    </div>` : ""}
-    </body>
-  </html>
-`;
+      doc.documentElement.innerHTML = `
+        <html>
+          <head>
+            <title>Print Image</title>
+            <style>
+            @page {
+              size: A5 landscape;
+              margin: 0;
+            }
+              body {
+                margin: 0;
+              }
+              .container {
+                position: relative;
+              }
+              .overlay {
+                position: absolute;
+                bottom: -1%;
+                left: 50%;
+                transform: translateX(-50%);
+                text-align: center;
+                background-color: white;
+                padding: 10px 20px;
+                border-radius: 5px;
+              }
+              .center {
+                text-align: center;
+              }
+              .wedDate {
+                position: absolute;
+                right: 8%;
+                font-size: 1.5rem;
+                font-weight: bold;
+              }
+              .overlay p {
+                margin: 0;
+                padding: 0;
+                font-size: 1rem;
+                font-family: 'Noto Sans Arabic', sans-serif;
+                font-weight: 300;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              ${printContent.outerHTML}
+              <div class="overlay">
+                <p>لقطة</p>
+              </div>
+            </div>
+            <div class="wedDate">
+              <p style="font-size:1.2rem">${new Date().toLocaleDateString()}</p>
+            </div>
+            ${husbandName && wifeName ? `<div class="center">
+            <p style="font-size:1.7rem; font-family: 'Montserrat', sans-serif; font-weight:500;">
+            ${husbandName} & ${wifeName}</p>
+          </div>` : ""}
+          
+          ${userText ? `<div id="test" class="userText center">
+            <p style="font-size:1.3rem">${userText}</p>
+          </div>` : ""}
+          </body>
+        </html>
+      `;
       printWindow.document.replaceChild(
         printWindow.document.importNode(doc.documentElement, true),
         printWindow.document.documentElement
       );
-  
+    
       printWindow.print();
-  
+    
       window.setTimeout(() => {
         printWindow.close();
       }, 1);
     }
   };
   
-
   const handleRetakeClick = () => {
     setImageSrc(null);
     setShowPreview(false);
@@ -176,7 +168,6 @@ doc.documentElement.innerHTML = `
   };
 
   const handleWriteClick = () => {
-    // setShowWriteModal(true);
     setShowWriteModal(!showWriteModal);
     setUserText("");
   };
@@ -222,7 +213,7 @@ doc.documentElement.innerHTML = `
             </Button>
           )}
 
-          {!showWriteModal && userText.length==0 && (
+          {!showWriteModal && userText.length === 0 && (
             <Button
               onClick={() => {
                 setRecording(!recording);
@@ -241,10 +232,12 @@ doc.documentElement.innerHTML = `
           <p>Loading...</p>
         ) : (
           <>
-          {isSaved && userText.length==0&&(  <QRCodeSVG
+          {isSaved && userText.length === 0 && (
+            <QRCodeSVG
               value={audioURL}
               className="absolute top-0 right-0 p-4"
-            />)}
+            />
+          )}
           
             <img
               src={imageSrc || ""}
