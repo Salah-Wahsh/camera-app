@@ -1,11 +1,14 @@
 import { useState, useRef } from "react";
 import recordEffect from "../assets/recordEffect.gif";
+import { Dropbox } from "dropbox";
+
 interface RecordProps {
   setIsSaved: (isSaved: boolean) => void;
   setUserText: (isSaved: string) => void;
   setRecord: (Record: boolean) => void; 
+  setAudioURL: (audioURL: string) => void;
 }
-const Record = ({setIsSaved, setUserText, setRecord}: RecordProps) => {
+const Record = ({setIsSaved, setUserText, setRecord, setAudioURL}: RecordProps) => {
   const [recording, setRecording] = useState(false);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -48,17 +51,106 @@ const Record = ({setIsSaved, setUserText, setRecord}: RecordProps) => {
     }
   };
 
-  const handleSave = () => {
+  // const handleSave = () => {
+  //   setIsSaved(true);
+  //   setRecord(false);
+  //   if (audioBlob) {
+  //     const downloadLink = document.createElement("a");
+  //     downloadLink.href = URL.createObjectURL(audioBlob);
+  //     downloadLink.download = "recorded_audio.wav";
+  //     downloadLink.click();
+  //     setShowDownload(false);
+  //   }
+  // };
+  const dbx = new Dropbox({ accessToken: "sl.BxvgNSShYyLFBsfQEwOyhcbIT2nSmpZiDB6uzJkcJPzxEI2pahOgQBh-OCGcsTvB5FcgP6yAZMXf4BeiEJQRY9xV856zB4EjqNvudLmm_VakfIdCcw_geGnSBbMIDxoHJSy6ehjMW_qpBCo" });
+
+  const handleSave = async () => {
     setIsSaved(true);
     setRecord(false);
+  
     if (audioBlob) {
-      const downloadLink = document.createElement("a");
-      downloadLink.href = URL.createObjectURL(audioBlob);
-      downloadLink.download = "recorded_audio.wav";
-      downloadLink.click();
-      setShowDownload(false);
+      const currentDate = new Date();
+      const fileName = `recorded_audio_${currentDate.toISOString()}.wav`;
+      try {
+        const response = await dbx.filesUpload({
+          path: `/${fileName}`,
+          contents: audioBlob,
+        });
+        console.log("File uploaded successfully!", response);
+        setShowDownload(false);
+  
+        // const uploadedFile = response.result;
+        const url = 'https://api.dropboxapi.com/2/sharing/create_shared_link_with_settings';
+        const accessToken = 'sl.BxvgNSShYyLFBsfQEwOyhcbIT2nSmpZiDB6uzJkcJPzxEI2pahOgQBh-OCGcsTvB5FcgP6yAZMXf4BeiEJQRY9xV856zB4EjqNvudLmm_VakfIdCcw_geGnSBbMIDxoHJSy6ehjMW_qpBCo';
+        const headers = {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        };
+        const data = {
+          // /recorded_audio_2024-03-18T17:29:59.177Z.wav
+          path: `${response.result.path_display}`
+        };
+        try {
+          const response = await fetch(url, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(data)
+          });
+  
+          if (response.ok) {
+            const result = await response.json();
+            // console.log('Shared link created:', result);
+            // console.log('Shared link:', result.url);
+            setAudioURL(result.url);
+          } else {
+            console.error('Failed to create shared link:', response.statusText);
+          }
+        } catch (error) {
+          console.error('Error:', error);
+        } 
+      } finally {
+          console.log('Shared link creation attempt complete');
+        }
     }
   };
+  
+  // const handleSave = async () => {
+  //   setIsSaved(true);
+  //   setRecord(false);
+  
+  //   if (audioBlob) {
+  //     const currentDate = new Date();
+  //     const fileName = `recorded_audio_${currentDate.toISOString()}.wav`;
+  //     try {
+  //       // const response = await dbx.filesUpload({
+  //       //   path: `/${fileName}`,
+  //       //   contents: audioBlob,
+  //       // });
+  //       const formData = new FormData();
+  //       formData.append('path', `/${fileName}`); // Replace with desired path
+  //       formData.append('file', audioBlob);
+  //       const response = await fetch('https://content.dropboxapi.com/2/files/upload', {
+  //       method: 'POST',
+  //       headers: {
+  //         Authorization: `Bearer ${accessToken}`,
+  //       },
+  //       body: formData,
+  //     });
+      
+  //     if (!response.ok) {
+  //       throw new Error('Error uploading to Dropbox');
+  //     }
+
+  //     const data = await response.json();
+  //     console.log('Upload successful:', data);
+  //     setShowDownload(false);
+
+  //   } catch (error) {
+  //     console.error('Error uploading to Dropbox:', error);
+  //     // Handle errors appropriately, like showing an error message to the user
+  //   }
+  //   }
+  // };
 
   return (
     <div>

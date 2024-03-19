@@ -4,6 +4,7 @@ import Button from "./Partials/Button";
 import Record from "./Record";
 import { QRCodeSVG } from "qrcode.react";
 import ReactDOM from 'react-dom';
+
 // import { JSX } from "react/jsx-runtime";
 
 
@@ -33,6 +34,7 @@ const Preview = ({
   const [wifeName, setwifeName] = useState("");
   const [recording, setRecording] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
+  const [audioURL, setAudioURL] = useState<string>("");
 
   useEffect(() => {
     const img = new Image();
@@ -51,7 +53,6 @@ const Preview = ({
       img.onerror = null;
     };
   }, [capturedImage]);
-
   const handlePrintClick = () => {
     const anchor = document.createElement("a");
     anchor.href = capturedImage;
@@ -69,8 +70,9 @@ const Preview = ({
   
 
     const printImage = new Image();
-    printImage.src = capturedImage;
-    printImage.style.maxWidth = "85%";
+    printImage.src = capturedImage; 
+
+    printImage.style.maxWidth = "80%";
     printImage.style.position = "relative";
     printImage.style.zIndex = "-1";
     printContent.appendChild(printImage);
@@ -78,8 +80,15 @@ const Preview = ({
   // recording
     if (isSaved && userText.length === 0) {
       const qrCodeWrapper = document.createElement("div");
-      qrCodeWrapper.style.marginTop = "25px";
-      ReactDOM.render(<QRCodeSVG value="https://reactjs.org/" size={64} />, qrCodeWrapper);
+      // qrCodeWrapper.style.marginLeft = "200px";
+      qrCodeWrapper.style.position = "absolute";
+      qrCodeWrapper.style.bottom = "-15%";
+      qrCodeWrapper.style.left = "2%";
+      qrCodeWrapper.style.width = "100px";
+      qrCodeWrapper.style.height = "100px";
+      
+      console.log(audioURL, "audioURL");
+      ReactDOM.render(<QRCodeSVG value={audioURL} size={64} />, qrCodeWrapper);
       printContent.appendChild(qrCodeWrapper);
     }
   
@@ -146,9 +155,6 @@ doc.documentElement.innerHTML = `
     </body>
   </html>
 `;
-    
-      
-  
       printWindow.document.replaceChild(
         printWindow.document.importNode(doc.documentElement, true),
         printWindow.document.documentElement
@@ -236,7 +242,7 @@ doc.documentElement.innerHTML = `
         ) : (
           <>
           {isSaved && userText.length==0&&(  <QRCodeSVG
-              value="https://reactjs.org/"
+              value={audioURL}
               className="absolute top-0 right-0 p-4"
             />)}
           
@@ -275,7 +281,7 @@ doc.documentElement.innerHTML = `
               </div>
             )}
 
-            {recording && <Record setUserText={setUserText} setIsSaved={setIsSaved} setRecord={setRecording}/>}
+            {recording && <Record setUserText={setUserText} setIsSaved={setIsSaved} setRecord={setRecording} setAudioURL={setAudioURL}/>}
           </>
         )}
       </div>
