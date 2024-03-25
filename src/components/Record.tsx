@@ -66,34 +66,34 @@ const Record = ({setIsSaved, setUserText, setRecord, setAudioURL, setIsRecordPre
   // };
   // dasdsasdadssddddddddddddddd
 
-  const getToken = async () => {
-    const requestData = new URLSearchParams();
-    requestData.append('code', import.meta.env.VITE_APP_CODE as string);
-    requestData.append('grant_type', 'authorization_code');
-    requestData.append('client_id', import.meta.env.VITE_APP_KEY as string);
-    requestData.append('client_secret', import.meta.env.VITE_APP_SECRET as string);
+  // const getToken = async () => {
+  //   const requestData = new URLSearchParams();
+  //   requestData.append('code', import.meta.env.VITE_APP_CODE as string);
+  //   requestData.append('grant_type', 'authorization_code');
+  //   requestData.append('client_id', import.meta.env.VITE_APP_KEY as string);
+  //   requestData.append('client_secret', import.meta.env.VITE_APP_SECRET as string);
 
-    fetch("https://api.dropbox.com/oauth2/token", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
-      },
-      body: requestData
-    })
-    .then(response => {
-      if (!response.ok) {
-        console.log(response);
-        throw new Error('Network response was not ok');
-      }
-      return response.json();
-    })
-    .then(data => {
-      console.log(data);  
-    })
-    .catch(error => {
-      console.error('There was a problem with the fetch operation:', error);
-    });
-  };
+  //   fetch("https://api.dropbox.com/oauth2/token", {
+  //     method: "POST",
+  //     headers: {
+  //       "Content-Type": "application/x-www-form-urlencoded"
+  //     },
+  //     body: requestData
+  //   })
+  //   .then(response => {
+  //     if (!response.ok) {
+  //       console.log(response);
+  //       throw new Error('Network response was not ok');
+  //     }
+  //     return response.json();
+  //   })
+  //   .then(data => {
+  //     console.log(data);  
+  //   })
+  //   .catch(error => {
+  //     console.error('There was a problem with the fetch operation:', error);
+  //   });
+  // };
   const dbx = new Dropbox({ accessToken: import.meta.env.VITE_DROPBOX_ACCESS_TOKEN as string });
   //   setIsSaved(true);
   //   setRecord(false);
