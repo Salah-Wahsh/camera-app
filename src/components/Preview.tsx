@@ -20,11 +20,41 @@ const Preview = ({
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [showWriteModal, setShowWriteModal] = useState(false);
   const [userText, setUserText] = useState("");
-  const [husbandName, sethusbandName] = useState("");
-  const [wifeName, setwifeName] = useState("");
+  const [husbandName, sethusbandName] = useState<string>(() => {
+    return localStorage.getItem("husbandName") || "";
+  });
+  const [wifeName, setwifeName] = useState<string>(() => {
+    return localStorage.getItem("wifeName") || "";
+  });
   const [recording, setRecording] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [audioURL, setAudioURL] = useState<string>("");
+  const [isRecordPressed, setIsRecordPressed] = useState(false) 
+  const [printButton, setPrintButton] = useState<string>("Print");
+
+  useEffect(()=>{
+    if(isRecordPressed){
+      setPrintButton("Uploading...");
+    }
+    else{
+      setPrintButton("Print");
+    }
+  },[isRecordPressed])
+  useEffect(() => {
+    localStorage.setItem("husbandName", husbandName);
+    const timeout = setTimeout(() => {
+      localStorage.removeItem("husbandName");
+    }, 3600000);
+    return () => clearTimeout(timeout);
+  }, [husbandName]);
+
+  useEffect(() => {
+    localStorage.setItem("wifeName", wifeName);
+    const timeout = setTimeout(() => {
+      localStorage.removeItem("wifeName");
+    }, 3600000);
+    return () => clearTimeout(timeout);
+  }, [wifeName]);
 
   useEffect(() => {
     const img = new Image();
@@ -45,7 +75,9 @@ const Preview = ({
   }, [capturedImage]);
 
   const handlePrintClick = () => {
+    // if(audioURL){
     printImage(capturedImage);
+  // }
   };
 
   const printImage = (capturedImage: string): void => {
@@ -138,7 +170,7 @@ const Preview = ({
               <p style="font-size:1.2rem">${new Date().toLocaleDateString()}</p>
             </div>
             ${husbandName && wifeName ? `<div class="center">
-            <p style="font-size:1.7rem; font-family: 'Montserrat', sans-serif; font-weight:500;">
+            <p style="font-size:1.2rem; font-family: 'Montserrat', sans-serif; font-weight:500;">
             ${husbandName} & ${wifeName}</p>
           </div>` : ""}
           
@@ -224,7 +256,7 @@ const Preview = ({
             </Button>
           )}
 
-          <Button onClick={handlePrintClick}>Print</Button>
+          <Button onClick={handlePrintClick} disabled={isRecordPressed} backgroundColor={`${isRecordPressed? `gray`: `blue`}`}>{printButton}</Button>
         </div>
       </div>
       <div className="preview-frame mt-20 relative">
@@ -232,7 +264,7 @@ const Preview = ({
           <p>Loading...</p>
         ) : (
           <>
-          {isSaved && userText.length === 0 && (
+          {isSaved && userText.length === 0 && !isRecordPressed&& (
             <QRCodeSVG
               value={audioURL}
               className="absolute top-0 right-0 p-4"
@@ -274,7 +306,7 @@ const Preview = ({
               </div>
             )}
 
-            {recording && <Record setUserText={setUserText} setIsSaved={setIsSaved} setRecord={setRecording} setAudioURL={setAudioURL}/>}
+            {recording && <Record setIsRecordPressed={setIsRecordPressed} setUserText={setUserText} setIsSaved={setIsSaved} setRecord={setRecording} setAudioURL={setAudioURL}/>}
           </>
         )}
       </div>
