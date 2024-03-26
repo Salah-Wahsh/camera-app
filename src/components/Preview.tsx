@@ -90,7 +90,7 @@ const Preview = ({
     const printImage = new Image();
     printImage.src = capturedImage; 
 
-    printImage.style.maxWidth = "80%";
+    printImage.style.maxWidth = "75%";
     printImage.style.position = "relative";
     printImage.style.zIndex = "-1";
     printContent.appendChild(printImage);

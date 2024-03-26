@@ -15,6 +15,7 @@ const Record = ({setIsSaved, setUserText, setRecord, setAudioURL, setIsRecordPre
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const [showDownload, setShowDownload] = useState(false);
 
+  const appAccessToken = useRef<string>('');
   const startRecording = () => {
     setUserText("");
     setShowDownload(false);
@@ -53,147 +54,96 @@ const Record = ({setIsSaved, setUserText, setRecord, setAudioURL, setIsRecordPre
     }
   };
 
-  // const handleSave = () => {
-  //   setIsSaved(true);
-  //   setRecord(false);
-  //   if (audioBlob) {
-  //     const downloadLink = document.createElement("a");
-  //     downloadLink.href = URL.createObjectURL(audioBlob);
-  //     downloadLink.download = "recorded_audio.wav";
-  //     downloadLink.click();
-  //     setShowDownload(false);
-  //   }
-  // };
-
-  const getAccessToken = async () => {
-    const requestData = new URLSearchParams();
-    requestData.append('code', import.meta.env.VITE_APP_CODE as string);
-    requestData.append('grant_type', 'authorization_code');
-    requestData.append('client_id', import.meta.env.VITE_APP_KEY as string);
-    requestData.append('client_secret', import.meta.env.VITE_APP_SECRET as string);
-
-    fetch("https://api.dropbox.com/oauth2/token", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
-      },
-      body: new URLSearchParams({
-        'code': import.meta.env.VITE_APP_CODE as string,
-        'grant_type': 'authorization_code',
-        'client_id': import.meta.env.VITE_APP_KEY as string,
-        'client_secret': import.meta.env.VITE_APP_SECRET as string,
-    })
-    })
-    .then(response => {
-      if (!response.ok) {
-        // throw new Error('Network response was not ok');
-      }
-      return response.json();
-    })
-    .then(data => {
-      console.log(data);  
-    })
-    .catch(error => {
-      console.log(error.message);
-      console.error('There was a problem with the fetch operation:', error);
+  const getNewAccessToken = async () => {
+    return new Promise<string>((resolve, reject) => {
+      fetch("https://api.dropbox.com/oauth2/token", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: new URLSearchParams({
+          'refresh_token': import.meta.env.VITE_DROPBOX_REFRSEH_TOKEN as string,
+          'grant_type': 'refresh_token',
+          'client_id': import.meta.env.VITE_APP_KEY as string,
+          'client_secret': import.meta.env.VITE_APP_SECRET as string,
+        })
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        const accessToken = data.access_token;
+        // console.log(accessToken, 'accessToken in the use state in getNewAccess');
+        resolve(accessToken); 
+      })
+      .catch(error => {
+        console.error('There was a problem with the fetch operation:', error);
+        reject(error);
+      });
     });
   };
-  const dbx = new Dropbox({ accessToken: import.meta.env.VITE_DROPBOX_ACCESS_TOKEN as string });
-  //   setIsSaved(true);
-  //   setRecord(false);
-  //   setIsRecordPressed(true);
-  //   if (audioBlob) {
-  //     const currentDate = new Date();
-  //     const fileName = `recorded_audio_${currentDate.toISOString()}.wav`;
-  //     try {
-  //       const response = await dbx.filesUpload({
-  //         path: `/${fileName}`,
-  //         contents: audioBlob,
-  //       });
-  //       console.log("File uploaded successfully!", response);
-  //       setShowDownload(false);
-  //       const url = 'https://api.dropboxapi.com/2/sharing/create_shared_link_with_settings';
-  //       const accessToken = import.meta.env.VITE_DROPBOX_ACCESS_TOKEN as string;
-  //       const headers = {
-  //         'Authorization': `Bearer ${accessToken}`,
-  //         'Content-Type': 'application/json'
-  //       };
-  //       const data = {
-  //         path: `${response.result.path_display}`
-  //       };
-  //       try {
-  //         const response = await fetch(url, {
-  //           method: 'POST',
-  //           headers: headers,
-  //           body: JSON.stringify(data)
-  //         });
-  
-  //         if (response.ok) {
-  //           const result = await response.json();
-  //           // console.log('Shared link created:', result);
-  //           // console.log('Shared link:', result.url);
-  //           setAudioURL(result.url);
-  //           setIsRecordPressed(false);
-  //         } else {
-  //           console.error('Failed to create shared link:', response.statusText);
-  //         }
-  //       } catch (error) {
-  //         console.error('Error:', error);
-  //       } 
-  //     } finally {
-  //         console.log('Shared link creation attempt complete');
-  //       }
-  //   }
-  // };
 
   const handleSave = async () => {
     setIsSaved(true);
     setRecord(false);
     setIsRecordPressed(true);
-    await getAccessToken();  
-    // if (audioBlob) {
-    //   const currentDate = new Date();
-    //   const fileName = `recorded_audio_${currentDate.toISOString()}.wav`;
-    //   // console.log(import.meta.env.VITE_DROPBOX_ACCESS_TOKEN);
-    //   try {
-    //     const response = await dbx.filesUpload({
-    //       path: `/${fileName}`,
-    //       contents: audioBlob,
-    //     });
-    //     console.log("File uploaded successfully!", response);
-    //     setShowDownload(false);
-    //     const url = 'https://api.dropboxapi.com/2/sharing/create_shared_link_with_settings';
-    //     const accessToken = import.meta.env.VITE_DROPBOX_ACCESS_TOKEN as string;
-    //     const headers = {
-    //       'Authorization': `Bearer ${accessToken}`,
-    //       'Content-Type': 'application/json'
-    //     };
-    //     const data = {
-    //       path: `${response.result.path_display}`
-    //     };
-    //     try {
-    //       const response = await fetch(url, {
-    //         method: 'POST',
-    //         headers: headers,
-    //         body: JSON.stringify(data)
-    //       });
   
-    //       if (response.ok) {
-    //         const result = await response.json();
-    //         // console.log('Shared link:', result.url);
-    //         setAudioURL(result.url);
-    //         setIsRecordPressed(false);
-    //       } else {
-    //         console.error('Failed to create shared link:', response.statusText);
-    //       }
-    //     } catch (error) {
-    //       console.error('Error:', error);
-    //     } 
-    //   } finally {
-    //       console.log('Shared link creation attempt complete');
-    //     }
-    // }
+    try {
+      const accessToken = await getNewAccessToken();
+      appAccessToken.current = accessToken;
+  
+      const dbx = new Dropbox({ accessToken });
+  
+      if (audioBlob) {
+        const currentDate = new Date();
+        const fileName = `recorded_audio_${currentDate.toISOString()}.wav`;
+        // console.log('accesssToken in handle SAVE', appAccessToken.current);
+  
+        try {
+          const response = await dbx.filesUpload({
+            path: `/${fileName}`,
+            contents: audioBlob,
+          });
+          console.log('File uploaded successfully!');
+          // console.log("File uploaded successfully!", response);
+          setShowDownload(false);
+          const url = 'https://api.dropboxapi.com/2/sharing/create_shared_link_with_settings';
+          const headers = {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
+          };
+          const data = {
+            path: `${response.result.path_display}`
+          };
+          try {
+            const response = await fetch(url, {
+              method: 'POST',
+              headers: headers,
+              body: JSON.stringify(data)
+            });
+  
+            if (response.ok) {
+              const result = await response.json();
+              setAudioURL(result.url);
+              setIsRecordPressed(false);
+            } else {
+              console.error('Failed to create shared link:', response.statusText);
+            }
+          } catch (error) {
+            console.error('Error:', error);
+          } 
+        } finally {
+          console.log('Shared link creation attempt complete');
+        }
+      }
+    } catch (error) {
+      console.error('Error while getting access token:', error);
+    }
   };
+  
   
 
   return (
