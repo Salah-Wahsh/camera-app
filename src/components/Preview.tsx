@@ -189,7 +189,7 @@ const Preview = ({
     
       window.setTimeout(() => {
         printWindow.close();
-      }, 1);
+      }, 2);
     }
   };
   
