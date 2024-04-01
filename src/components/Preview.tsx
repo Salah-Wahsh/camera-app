@@ -93,7 +93,9 @@ const Preview = ({
     printImage.style.maxWidth = "75%";
     printImage.style.position = "relative";
     printImage.style.zIndex = "-1";
+    console.log(printImage);
     printContent.appendChild(printImage);
+
 
     // recording
     if (isSaved && userText.length === 0) {
@@ -146,7 +148,8 @@ const Preview = ({
               }
               .wedDate {
                 position: absolute;
-                right: 8%;
+                right: 2%;
+                bottom: 1%;
                 font-size: 1.5rem;
                 font-weight: bold;
               }
@@ -175,7 +178,7 @@ const Preview = ({
           </div>` : ""}
           
           ${userText ? `<div id="test" class="userText center">
-            <p style="font-size:1.3rem">${userText}</p>
+            <p style="font-size:1.1rem">${userText}</p>
           </div>` : ""}
           </body>
         </html>
@@ -184,12 +187,12 @@ const Preview = ({
         printWindow.document.importNode(doc.documentElement, true),
         printWindow.document.documentElement
       );
-    
+      
       printWindow.print();
-    
+
       window.setTimeout(() => {
         printWindow.close();
-      }, 2);
+      }, 1);
     }
   };
   
@@ -217,7 +220,8 @@ const Preview = ({
         >
           Retake
         </button>
-        <label className="text-white font-medium" htmlFor="husbandName">Husband Name
+        <div className="flex mx-2">
+        <label className="text-white font-medium mr-4" htmlFor="husbandName">Husband Name
         <br/>
         <input
         className="mt-2 h-12 rounded-lg text-black"
@@ -233,9 +237,63 @@ const Preview = ({
         id="wifeName"  
          value={wifeName}
           onChange={(e) => setwifeName(e.target.value)}/></label>
+      </div>
+      </div>
 
+      <div className="preview-frame mt-20 mr-40 relative">
+        {loading ? (
+          <p>Loading...</p>
+        ) : (
+          <>
+          {isSaved && userText.length === 0 && !isRecordPressed&& (
+            <QRCodeSVG
+              value={audioURL}
+              className="absolute top-0 right-0 p-4"
+            />
+          )}
+          
+            <img
+              src={imageSrc || ""}
+              alt="Captured Preview"
+              className="preview-image"
+            />
 
-        <div className="flex space-x-8 mb-3">
+            {showWriteModal && (
+              <div className="modal ">
+                <textarea
+                  className="block p-2.5 w-full text-xl text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  value={userText}
+                  maxLength={100}
+                  rows={2}
+                  onChange={(e) => setUserText(e.target.value)}
+                />
+                <button
+                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full mt-4 mr-4"
+                  onClick={handleInsertText}
+                >
+                  Insert
+                </button>
+                <button
+                  className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full "
+                  onClick={() => {
+                    setUserText("");
+                  }}
+                >
+                  Clear
+                </button>
+              </div>
+            )}
+            {userText && !showWriteModal && (
+              <div className="text-preview text-white text-xl max-w-2xl text-wrap ">
+                <p className="">{userText}</p>
+              </div>
+            )}
+
+            {recording && <Record setIsRecordPressed={setIsRecordPressed} setUserText={setUserText} setIsSaved={setIsSaved} setRecord={setRecording} setAudioURL={setAudioURL}/>}
+          </>
+        )}
+      </div>
+      <div className="flex flex-col justify-end space-y-8 absolute right-12">
           {!recording && (
             <Button
               onClick={handleWriteClick}
@@ -258,58 +316,6 @@ const Preview = ({
 
           <Button onClick={handlePrintClick} disabled={isRecordPressed} backgroundColor={`${isRecordPressed? `gray`: `blue`}`}>{printButton}</Button>
         </div>
-      </div>
-      <div className="preview-frame mt-20 relative">
-        {loading ? (
-          <p>Loading...</p>
-        ) : (
-          <>
-          {isSaved && userText.length === 0 && !isRecordPressed&& (
-            <QRCodeSVG
-              value={audioURL}
-              className="absolute top-0 right-0 p-4"
-            />
-          )}
-          
-            <img
-              src={imageSrc || ""}
-              alt="Captured Preview"
-              className="preview-image"
-            />
-
-            {showWriteModal && (
-              <div className="modal ">
-                <textarea
-                  className="block p-2.5 w-full text-2xl text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  value={userText}
-                  onChange={(e) => setUserText(e.target.value)}
-                />
-                <button
-                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full mt-4 mr-4"
-                  onClick={handleInsertText}
-                >
-                  Insert
-                </button>
-                <button
-                  className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full "
-                  onClick={() => {
-                    setUserText("");
-                  }}
-                >
-                  Clear
-                </button>
-              </div>
-            )}
-            {userText && !showWriteModal && (
-              <div className="text-preview text-white text-2xl ">
-                {userText}
-              </div>
-            )}
-
-            {recording && <Record setIsRecordPressed={setIsRecordPressed} setUserText={setUserText} setIsSaved={setIsSaved} setRecord={setRecording} setAudioURL={setAudioURL}/>}
-          </>
-        )}
-      </div>
     </div>
   );
 };
