@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import "../App.css";
 import Button from "./Partials/Button";
 import Record from "./Record";
+import frame from '../assets/frame.png'
 import { QRCodeSVG } from "qrcode.react";
 import ReactDOMServer from "react-dom/server";
 
@@ -119,70 +120,80 @@ const Preview = ({
     if (printWindow) {
       const doc = document.implementation.createHTMLDocument("Print Image");
       doc.documentElement.innerHTML = `
-        <html>
-          <head>
-            <title>Print Image</title>
-            <style>
-            @page {
-              size: A5 landscape;
-              margin: 0;
-            }
-              body {
-                margin: 0;
-              }
-              .container {
-                position: relative;
-              }
-              .overlay {
-                position: absolute;
-                bottom: -1%;
-                left: 50%;
-                transform: translateX(-50%);
-                text-align: center;
-                background-color: white;
-                padding: 10px 20px;
-                border-radius: 5px;
-              }
-              .center {
-                text-align: center;
-              }
-              .wedDate {
-                position: absolute;
-                right: 2%;
-                bottom: 1%;
-                font-size: 1.5rem;
-                font-weight: bold;
-              }
-              .overlay p {
-                margin: 0;
-                padding: 0;
-                font-size: 1rem;
-                font-family: 'Noto Sans Arabic', sans-serif;
-                font-weight: 300;
-              }
-            </style>
-          </head>
-          <body>
-            <div class="container">
-              ${printContent.outerHTML}
-              <div class="overlay">
-                <p>لقطة</p>
-              </div>
-            </div>
-            <div class="wedDate">
-              <p style="font-size:1.2rem">${new Date().toLocaleDateString()}</p>
-            </div>
-            ${husbandName && wifeName ? `<div class="center">
-            <p style="font-size:1.2rem; font-family: 'Montserrat', sans-serif; font-weight:500;">
-            ${husbandName} & ${wifeName}</p>
-          </div>` : ""}
-          
-          ${userText ? `<div id="test" class="userText center">
-            <p style="font-size:1.1rem">${userText}</p>
-          </div>` : ""}
-          </body>
-        </html>
-      `;
+  <html>
+    <head>
+      <title>Print Image</title>
+      <style>
+        @page {
+          size: A5 landscape;
+          margin: 0;
+        }
+        body {
+          margin: 0;
+        }
+        .container {
+          position: relative;
+        }
+        .frame {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+        }
+        .overlay {
+          position: absolute;
+          bottom: -1%;
+          left: 50%;
+          transform: translateX(-50%);
+          text-align: center;
+          background-color: white;
+          padding: 10px 20px;
+          border-radius: 5px;
+        }
+        .center {
+          text-align: center;
+        }
+        .wedDate {
+          position: absolute;
+          right: 2%;
+          bottom: 1%;
+          font-size: 1.5rem;
+          font-weight: bold;
+        }
+        .overlay p {
+          margin: 0;
+          padding: 0;
+          font-size: 1rem;
+          font-family: 'Noto Sans Arabic', sans-serif;
+          font-weight: 300;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <img src="${frame}" alt="frame" class="frame">
+        ${printContent.outerHTML}
+
+      </div>
+      <div class="wedDate">
+        <p style="font-size:1.2rem">${new Date().toLocaleDateString()}</p>
+      </div>
+      ${husbandName && wifeName ? `
+        <div class="center">
+          <p style="font-size:1.2rem; font-family: 'Montserrat', sans-serif; font-weight:500;">
+            ${husbandName} & ${wifeName}
+          </p>
+        </div>` 
+      : ""}
+      ${userText ? `
+        <div id="test" class="userText center">
+          <p style="font-size:1.1rem">${userText}</p>
+        </div>` 
+      : ""}
+    </body>
+  </html>
+`;
       printWindow.document.replaceChild(
         printWindow.document.importNode(doc.documentElement, true),
         printWindow.document.documentElement
