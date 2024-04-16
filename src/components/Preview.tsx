@@ -199,11 +199,14 @@ const Preview = ({
         printWindow.document.documentElement
       );
       
-      printWindow.print();
-
-      window.setTimeout(() => {
+      setTimeout(function() {
+        printWindow.print();
         printWindow.close();
-      }, 1);
+
+    }, 300); // 1000 milliseconds delay (1 second), you can adjust this value as per your requirement
+    
+
+    
     }
   };
   
