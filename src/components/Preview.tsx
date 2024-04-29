@@ -108,11 +108,11 @@ const Preview = ({
       
       // Set styles for qrCodeWrapper
       qrCodeWrapper.style.position = "absolute";
-      qrCodeWrapper.style.bottom = "-17%";
-      qrCodeWrapper.style.left = "2%";
-      qrCodeWrapper.style.width = "80px";
-      qrCodeWrapper.style.height = "80px";
-      
+      qrCodeWrapper.style.marginLeft = "auto";
+      qrCodeWrapper.style.marginRight = "auto";
+      qrCodeWrapper.style.left = "0";
+      qrCodeWrapper.style.right = "55%";
+      qrCodeWrapper.style.bottom = "1%";
       printContent.appendChild(qrCodeWrapper);
     }
     
@@ -125,7 +125,7 @@ const Preview = ({
       <title>Print Image</title>
       <style>
         @page {
-          size: A5 landscape;
+          size: 210mm 120mm; 
           margin: 0;
         }
         body {
@@ -157,9 +157,18 @@ const Preview = ({
         .wedDate {
           position: absolute;
           right: 2%;
-          bottom: 1%;
+          bottom: 0%;
           font-size: 1.5rem;
           font-weight: bold;
+        }
+        .names {
+          position: absolute;
+          margin-left: auto;
+          margin-right: auto;
+          left: 0;
+          right: 0;
+          bottom:8%;
+          text-align: center;
         }
         .overlay p {
           margin: 0;
@@ -167,6 +176,15 @@ const Preview = ({
           font-size: 1rem;
           font-family: 'Noto Sans Arabic', sans-serif;
           font-weight: 300;
+        }
+        .userText{
+          position: absolute;
+          margin-left: auto;
+          margin-right: auto;
+          left: 0;
+          right: 0;
+          bottom:2%;
+          text-align: center;
         }
       </style>
     </head>
@@ -177,10 +195,10 @@ const Preview = ({
 
       </div>
       <div class="wedDate">
-        <p style="font-size:1.2rem">${new Date().toLocaleDateString()}</p>
+        <p style="font-size:1rem">${new Date().toLocaleDateString()}</p>
       </div>
       ${husbandName && wifeName ? `
-        <div class="center">
+        <div class="center names">
           <p style="font-size:1.2rem; font-family: 'Montserrat', sans-serif; font-weight:500;">
             ${husbandName} & ${wifeName}
           </p>
