@@ -76,10 +76,6 @@ Error generating stack: `+o.message+`
     <head>
       <title>Print Image</title>
       <style>
-        @page {
-          size: 150mm 110mm; 
-          margin: 0;
-        }
         body {
           margin: 0;
         }
