@@ -85,13 +85,13 @@ const Preview = ({
     const container = document.createElement("div");
     container.style.display = "flex";
     const printContent = document.createElement("div");
-    printContent.style.textAlign = "center";
+    // printContent.style.textAlign = "center";
     container.appendChild(printContent);
   
     const printImage = new Image();
     printImage.src = capturedImage; 
 
-    printImage.style.maxWidth = "75%";
+    printImage.style.maxWidth = "100%";
     printImage.style.position = "relative";
     printImage.style.zIndex = "-1";
     console.log(printImage);
@@ -142,13 +142,13 @@ const Preview = ({
           bottom: -1%;
           left: 50%;
           transform: translateX(-50%);
-          text-align: center;
+         /* text-align: center;*/
           background-color: white;
           padding: 10px 20px;
           border-radius: 5px;
         }
         .center {
-          text-align: center;
+          /* text-align: center;*/
         }
         .wedDate {
           position: absolute;
@@ -215,7 +215,7 @@ const Preview = ({
       
       setTimeout(function() {
         printWindow.print();
-        printWindow.close();
+        // printWindow.close();
 
     }, 300); // 1000 milliseconds delay (1 second), you can adjust this value as per your requirement
     
